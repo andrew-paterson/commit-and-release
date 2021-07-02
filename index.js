@@ -31,6 +31,7 @@ module.exports = {
       const gitLog = await git.log();
       const headTag = gitLog.latest.refs.match(/.*tag: (.*?),.*/);
       let newTag;
+      let newSha;
       if (!hasChangesToCommit && headTag) {
         console.log(chalk.cyan(`[${repoName}] Nothing to commit - HEAD is still at ${gitLog.latest.hash}`));
         console.log(chalk.cyan(`[${repoName}] Tagging skipped, HEAD already tagged with ${headTag[1]}`));
@@ -47,7 +48,7 @@ module.exports = {
         await git.add('.');
         console.log(chalk.green(`[${repoName}] Added untracked files`));
         const commitResult = await git.commit(commitMessage);
-        const newSha = commitResult.commit.length ? commitResult.commit : null;
+        newSha = commitResult.commit.length ? commitResult.commit : null;
         if (newSha) {
           console.log(chalk.green(`[${repoName}] Add commit ${newSha} in branch ${commitResult.branch}: ${JSON.stringify(commitResult.summary)}`));
         } else {
