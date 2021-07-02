@@ -27,7 +27,7 @@ module.exports = {
     }
     try {
       const gitLog = await git.log();
-      console.log(await git.diff());
+      console.log(`[${await git.diff()}]`);
       return;
       const latestCommitTag = gitLog.latest.refs.match(/.*tag: (.*?),.*/);
       let newTag;
