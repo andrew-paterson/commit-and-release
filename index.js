@@ -18,7 +18,8 @@ async function run() {
   // console.log(newTag);
   const tagArgs = tagMessage ? ['-a', newTag, '-m', tagMessage] : [newTag];
   await git.tag(tagArgs);
-  console.log(await git.show(newTag, ['--oneline']))
+  const addedTag = await git.show(newTag).split('\n')[0];
+  console.log(addedTag);
   // console.log(await lib.highestTag(git));
 
   // console.log(await git.tag());
