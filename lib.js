@@ -1,6 +1,6 @@
 module.exports =  {
   bumpTag(git, opts) {
-    opts.releaseType = opts.releaseType || 'patch';
+    const releaseType = opts.releaseType || 'patch';
     return new Promise((resolve, reject) => {
       const releaseTypes = ['major', 'minor', 'patch'];
       const matchIndex = releaseTypes.indexOf(releaseType);
@@ -9,7 +9,12 @@ module.exports =  {
           reject(err);
           return;
         }
-        const tags = (result || '').split('\n');
+        console.log(!result.length);
+        if (!result.length) {
+          reject('No existing tags');
+          return;
+        }
+        const tags = result.split('\n');
         const mostRecent = tags.sort((a, b) => {
           return this.naturalSort(b, a);
         })[0];
