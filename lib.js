@@ -1,4 +1,48 @@
+const chalk = require('chalk');
+const simpleGit = require('simple-git');
+const path = require('path');
+
 module.exports =  {
+  async tagAndRelease(opts = {}) {
+    if (!opts.commitMessage) {
+      return {
+        status: 'error',
+        error: 'You must pass commitMessage in the options arg.'
+      }
+    }
+    const options = {
+      baseDir: opts.repo ? path.resolve(opts.repo) : path.resolve(process.cwd()),
+    }
+    const commitMessage = opts.commitMessage;
+    const git = simpleGit(options);
+    try {
+      await git.add('.');
+      console.log(chalk.green('Added untracked files'));
+      const commit = await git.commit(commitMessage);
+      console.log(chalk.green(`Committed changes to ${commit.commit} in branch ${commit.branch}: ${JSON.stringify(commit.summary)}`));
+      const newTag = await lib.bumpTag(git);
+      const tagArgs = opts.tagMessage ? ['-a', newTag, '-m', opts.tagMessage] : [newTag];
+      await git.tag(tagArgs);
+      const showTag = await git.show(newTag);
+      const newtagCommit = showTag.split('\n').filter(line => line.startsWith('commit'));
+      console.log(chalk.green(`Added new ${showTag.split('\n')[0]} to ${newtagCommit}`));
+      await git.push();
+      console.log(chalk.green('Pushed code'));
+      await git.push(['--tags']);
+      console.log(chalk.green('Pushed tags'));
+      console.log(chalk.blue('Done'));
+      return {
+        status: 'success',
+      }
+    }
+    catch (err) {
+      return {
+        status: 'error',
+        error: err
+      }
+    }
+  }, 
+
   async bumpTag(git, opts = {}) {
     const releaseTypes = ['major', 'minor', 'patch'];
     const releaseType = opts.releaseType || 'patch';
