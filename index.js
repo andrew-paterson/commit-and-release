@@ -3,8 +3,8 @@ const simpleGit = require('simple-git');
 const options = {
   // baseDir: '../pandago'
 }
-const commitMessage = 'Commit 3';
-const tagMessage = 'tag message 3'
+const commitMessage = 'Commit 4';
+const tagMessage = 'tag message 4'
 const git = simpleGit(options);
 
 async function run() {
@@ -15,10 +15,12 @@ async function run() {
   await git.commit(commitMessage);
   // console.log(await git.push());
   const newTag = await lib.bumpTag(git);
-  console.log(newTag);
+  // console.log(newTag);
   const tagArgs = tagMessage ? ['-a', newTag, '-m', tagMessage] : [newTag];
-  await git.tag(tagArgs);
-  console.log(await git.tag());
+  await git.tag(tagArgs, function(err, result) {
+    console.log(result);
+  });
+  // console.log(await git.tag());
 }
 
 run();
