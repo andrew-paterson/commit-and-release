@@ -17,13 +17,9 @@ async function run() {
   const newTag = await lib.bumpTag(git);
   // console.log(newTag);
   const tagArgs = tagMessage ? ['-a', newTag, '-m', tagMessage] : [newTag];
-  await git.tag(tagArgs, function(err, result) {
-    if (!err) {
-      lib.highestTag(git).then(res => {
-        console.log(res)
-      });
-    }
-  });
+  await git.tag(tagArgs);
+  console.log(await lib.highestTag(git));
+
   // console.log(await git.tag());
 }
 
