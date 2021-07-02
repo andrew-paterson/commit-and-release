@@ -12,7 +12,8 @@ async function run() {
   try {
     await git.add('.');
     console.log(chalk.green('Added untracked files'));
-    await git.commit(commitMessage);
+    const test = await git.commit(commitMessage);
+    console.log(test);
     console.log(chalk.green('Committed changes'));
     const newTag = await lib.bumpTag(git);
     const tagArgs = tagMessage ? ['-a', newTag, '-m', tagMessage] : [newTag];
@@ -24,6 +25,7 @@ async function run() {
     console.log(chalk.green('Pushed code'));
     await git.push(['--tags']);
     console.log(chalk.green('Pushed tags'));
+    console.log(chalk.blue('Done'));
   }
   catch (err) {
     console.log(err);
