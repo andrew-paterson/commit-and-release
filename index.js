@@ -18,8 +18,9 @@ async function run() {
   // console.log(newTag);
   const tagArgs = tagMessage ? ['-a', newTag, '-m', tagMessage] : [newTag];
   await git.tag(tagArgs);
-  const addedTag = await git.show(newTag);
-  console.log(`Added new ${addedTag.split('\n')[0]}`);
+  const showTag = await git.show(newTag);
+  const newtagCommit = showTag.split('\n').filter(line => line.startsWith('commit'));
+  console.log(`Added new ${showTag.split('\n')[0]} to ${newtagCommit}`);
   // console.log(await lib.highestTag(git));
 
   // console.log(await git.tag());
