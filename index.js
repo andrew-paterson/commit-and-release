@@ -23,49 +23,57 @@ module.exports = {
       packageFile = require(`${baseDir}/package.json`)
     }
     catch (err) {
-      packageFile = null;
+      packageFile = {};
     }
     try {
+      const diff = await git.diff();
+      const hasChangesToCommit = diff.length > 0;
       const gitLog = await git.log();
-      console.log(`[${await git.diff()}]`);
-      return;
-      const latestCommitTag = gitLog.latest.refs.match(/.*tag: (.*?),.*/);
-      let newTag;
-      if (!latestCommitTag) {
-        newTag = await this.bumpTag(git, {releaseType: opts.releaseType});
-        if (packageFile) {
+      const headTag = gitLog.latest.refs.match(/.*tag: (.*?),.*/);
+      if (!hasChangesToCommit && headTag) {
+        console.log(chalk.cyan(`[${repoName}] Nothing to commit - HEAD is still at ${gitLog.latest.hash}`));
+        console.log(chalk.cyan(`[${repoName}] Tagging skipped, HEAD already tagged with ${headTag[1]}`));
+      } else {
+        // let newTag;
+        // if (!headTag) {
+        const newTag = await this.bumpTag(git, {releaseType: opts.releaseType});
+        if (packageFile.version && packageFile.version !== newTag) {
           packageFile.version = newTag;
           fs.writeFileSync(`${baseDir}/package.json`, JSON.stringify(packageFile,null, 2));
+          console.log(chalk.green(`[${repoName}] Updated version in package.json to ${newTag}`));
         }
-      }
-      await git.add('.');
-      console.log(chalk.green(`[${repoName}] Added untracked files`));
-      const commitResult = await git.commit(commitMessage);
-      const newSha = commitResult.commit.length ? commitResult.commit : null;
-      if (newSha) {
-        console.log(chalk.green(`[${repoName}] Add commit ${newSha} in branch ${commitResult.branch}: ${JSON.stringify(commitResult.summary)}`));
-      } else {
-        console.log(chalk.cyan(`[${repoName}] Nothing to commit - head is still at ${gitLog.latest.hash}`));
-      }
-      if (latestCommitTag) {
-        console.log(chalk.cyan(`[${repoName}] Tagging skipped, head already tagged with ${latestCommitTag[1]}`));
-      } else {
+        // }
+        await git.add('.');
+        console.log(chalk.green(`[${repoName}] Added untracked files`));
+        const commitResult = await git.commit(commitMessage);
+        const newSha = commitResult.commit.length ? commitResult.commit : null;
+        if (newSha) {
+          console.log(chalk.green(`[${repoName}] Add commit ${newSha} in branch ${commitResult.branch}: ${JSON.stringify(commitResult.summary)}`));
+        } else {
+          console.log(chalk.cyan(`[${repoName}] Nothing to commit - head is still at ${gitLog.latest.hash}`));
+        }
+        // } else {
+          // console.log(chalk.cyan(`[${repoName}] Nothing to commit - head is still at ${gitLog.latest.hash}`));
+        // }
+        // if (headTag) {
+          // console.log(chalk.cyan(`[${repoName}] Tagging skipped, head already tagged with ${headTag[1]}`));
+        // } else {
         const tagArgs = opts.tagMessage ? ['-a', newTag, '-m', opts.tagMessage] : [newTag];
         await git.tag(tagArgs);
         const showTag = await git.show(newTag);
         const newTagCommit = showTag.split('\n').filter(line => line.startsWith('commit'));
         console.log(chalk.green(`[${repoName}] Added tag ${newTag} to ${newTagCommit}`));
+        // }
       }
       await git.push();
       console.log(chalk.green(`[${repoName}] Pushed code`));
       await git.push(['--tags']);
       console.log(chalk.green(`[${repoName}] Pushed tags`));
       console.log(chalk.blue(`[${repoName}] Done`));
-
       return {
         status: 'success',
         results: {
-          tag: newTag || latestCommitTag[1],
+          tag: newTag || headTag[1],
           commit: newSha || gitLog.latest.hash
         }
       }
