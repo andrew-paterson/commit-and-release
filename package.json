@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "chalk": "^4.1.1",
     "git": "^0.1.5",
     "simple-git": "^2.40.0"
   }
