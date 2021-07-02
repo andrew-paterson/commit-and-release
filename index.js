@@ -19,7 +19,7 @@ async function run() {
   const tagArgs = tagMessage ? ['-a', newTag, '-m', tagMessage] : [newTag];
   await git.tag(tagArgs);
   const addedTag = await git.show(newTag);
-  console.log(addedTag.split('\n')[0]);
+  console.log(`Added new ${addedTag.split('\n')[0]}`);
   // console.log(await lib.highestTag(git));
 
   // console.log(await git.tag());
