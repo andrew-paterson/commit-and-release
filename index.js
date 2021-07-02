@@ -29,7 +29,7 @@ module.exports =  {
       const newTag = await this.bumpTag(git, {releaseType: opts.releaseType});
       if (packageFile) {
         packageFile.version = newTag;
-        fs.writeFileSync(`${baseDir}/package.json`, JSON.stringify(packageFile));
+        fs.writeFileSync(`${baseDir}/package.json`, JSON.stringify(packageFile,null, 2));
       }
       await git.add('.');
       console.log(chalk.green('Added untracked files'));
