@@ -13,7 +13,6 @@ async function run() {
     await git.add('.');
     console.log(chalk.green('Added untracked files'));
     const commit = await git.commit(commitMessage);
-    console.log(test);
     console.log(chalk.green(`Committed changes to ${commit.commit} in branch ${commit.branch}: ${JSON.stringify(commit.summary)}`));
     const newTag = await lib.bumpTag(git);
     const tagArgs = tagMessage ? ['-a', newTag, '-m', tagMessage] : [newTag];
