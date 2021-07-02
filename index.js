@@ -30,13 +30,14 @@ module.exports = {
       const hasChangesToCommit = diff.length > 0;
       const gitLog = await git.log();
       const headTag = gitLog.latest.refs.match(/.*tag: (.*?),.*/);
+      let newTag;
       if (!hasChangesToCommit && headTag) {
         console.log(chalk.cyan(`[${repoName}] Nothing to commit - HEAD is still at ${gitLog.latest.hash}`));
         console.log(chalk.cyan(`[${repoName}] Tagging skipped, HEAD already tagged with ${headTag[1]}`));
       } else {
         // let newTag;
         // if (!headTag) {
-        const newTag = await this.bumpTag(git, {releaseType: opts.releaseType});
+        newTag = await this.bumpTag(git, {releaseType: opts.releaseType});
         if (packageFile.version && packageFile.version !== newTag) {
           packageFile.version = newTag;
           fs.writeFileSync(`${baseDir}/package.json`, JSON.stringify(packageFile,null, 2));
