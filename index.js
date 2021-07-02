@@ -1,11 +1,11 @@
 const chalk = require('chalk');
 const simpleGit = require('simple-git');
 const path = require('path');
-const { fstat } = require('fs');
 const fs = require('fs');
 
 module.exports =  {
   async tagAndRelease(opts = {}) {
+    console.log(this);
     if (!opts.commitMessage) {
       return {
         status: 'error',
