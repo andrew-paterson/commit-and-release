@@ -27,7 +27,7 @@ module.exports =  {
       console.log(showTag);
       console.log(newTag);
       const newtagCommit = showTag.split('\n').filter(line => line.startsWith('commit'));
-      console.log(chalk.green(`Added new ${showTag.split('\n')[0]} to ${newtagCommit}`));
+      console.log(chalk.green(`Added tag ${newTag} to ${newtagCommit}`));
       await git.push();
       console.log(chalk.green('Pushed code'));
       await git.push(['--tags']);
