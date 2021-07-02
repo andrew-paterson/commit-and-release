@@ -9,7 +9,6 @@ module.exports =  {
           reject(err);
           return;
         }
-        console.log(!result.length);
         if (!result.length) {
           reject('No existing tags');
           return;
