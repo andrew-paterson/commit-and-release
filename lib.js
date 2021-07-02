@@ -1,9 +1,24 @@
 module.exports =  {
-  bumpTag(git, opts = {}) {
+  async bumpTag(git, opts = {}) {
+    const releaseTypes = ['major', 'minor', 'patch'];
     const releaseType = opts.releaseType || 'patch';
+    const matchIndex = releaseTypes.indexOf(releaseType);
+    const highestTag = await this.highestTag(git) 
+    const numbers = highestTag.match(/(\d*)\.(\d*)\.(\d*)/);
+    const newVersion = releaseTypes.map((_, index) => {
+      if (index < matchIndex) {
+        return numbers[index + 1];
+      } else if (index === matchIndex) {
+        return parseInt(numbers[index + 1]) + 1;
+      } else {
+        return '0';
+      }
+    }).join('.');
+    return highestTag.replace(/\d*\.\d*\.\d*/, newVersion);
+  },
+
+  highestTag(git) {
     return new Promise((resolve, reject) => {
-      const releaseTypes = ['major', 'minor', 'patch'];
-      const matchIndex = releaseTypes.indexOf(releaseType);
       git.tag(null, (err, result) => {
         if (err) {
           reject(err);
@@ -14,20 +29,9 @@ module.exports =  {
           return;
         }
         const tags = result.split('\n');
-        const mostRecent = tags.sort((a, b) => {
+        resolve(tags.sort((a, b) => {
           return this.naturalSort(b, a);
-        })[0];
-        const numbers = mostRecent.match(/(\d*)\.(\d*)\.(\d*)/);
-        const newVersion = releaseTypes.map((_, index) => {
-          if (index < matchIndex) {
-            return numbers[index + 1];
-          } else if (index === matchIndex) {
-            return parseInt(numbers[index + 1]) + 1;
-          } else {
-            return '0';
-          }
-        }).join('.');
-        resolve(mostRecent.replace(/\d*\.\d*\.\d*/, newVersion));
+        })[0]);
       });
     });
   },
