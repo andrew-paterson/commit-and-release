@@ -12,6 +12,7 @@ module.exports = {
       }
     }
     const baseDir = opts.repo ? path.resolve(opts.repo) : path.resolve(process.cwd());
+    const repoName = path.basename(baseDir);
     const options = {
       baseDir: baseDir,
     }
@@ -31,25 +32,46 @@ module.exports = {
         fs.writeFileSync(`${baseDir}/package.json`, JSON.stringify(packageFile,null, 2));
       }
       await git.add('.');
-      console.log(chalk.green('Added untracked files'));
-      const commit = await git.commit(commitMessage);
-      console.log(chalk.green(`Committed changes to ${commit.commit} in branch ${commit.branch}: ${JSON.stringify(commit.summary)}`));
+      console.log(chalk.green(`[${repoName}] Added untracked files`));
+      const commitResult = await git.commit(commitMessage);
+      const newSha = commitResult.commit.length ? commitResult.commit : null;
+      const gitLog = await git.log();
+      if (newSha) {
+        console.log(chalk.green(`[${repoName}] Add commit ${newSha} in branch ${commitResult.branch}: ${JSON.stringify(commitResult.summary)}`));
+      } else {
+        console.log(chalk.cyan(`[${repoName}] Nothing to commit - head is still at ${gitLog.latest.hash}`));
+      }
+      const latestCommitTag = gitLog.latest.refs.match(/.*tag: (.*?),.*/);
+      if (latestCommitTag) {
+        console.log(chalk.cyan(`[${repoName}] Tagging skipped, head already tagged with ${latestCommitTag[1]}`));
+        return {
+          status: 'success',
+          results: {
+            tag: latestCommitTag[1],
+            commit: newSha || gitLog.latest.hash
+          }
+        }
+      }
       const tagArgs = opts.tagMessage ? ['-a', newTag, '-m', opts.tagMessage] : [newTag];
       await git.tag(tagArgs);
       const showTag = await git.show(newTag);
       const newTagCommit = showTag.split('\n').filter(line => line.startsWith('commit'));
-      console.log(chalk.green(`Added tag ${newTag} to ${newTagCommit}`));
+      console.log(chalk.green(`[${repoName}] Added tag ${newTag} to ${newTagCommit}`));
       await git.push();
-      console.log(chalk.green('Pushed code'));
+      console.log(chalk.green(`[${repoName}] Pushed code`));
       await git.push(['--tags']);
-      console.log(chalk.green('Pushed tags'));
-      console.log(chalk.blue('Done'));
+      console.log(chalk.green(`[${repoName}] Pushed tags`));
+      console.log(chalk.blue(`[${repoName}] Done`));
       return {
         status: 'success',
+        results: {
+          tag: newTag,
+          commit: commit.commit
+        }
       }
     }
     catch (err) {
-      console.log(chalk.red(err))
+      console.log(chalk.red(err));
       return {
         status: 'error',
         error: err
