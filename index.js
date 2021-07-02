@@ -13,7 +13,7 @@ async function run() {
   const newTag = await lib.bumpTag(git, {releaseType:'major'});
   console.log(newTag);
   await git.commit(commitMessage);
-  console.log(await git.status());
+  console.log(await git.push());
 }
 
 run();
