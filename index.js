@@ -3,9 +3,8 @@ const simpleGit = require('simple-git');
 const path = require('path');
 const fs = require('fs');
 
-module.exports =  {
-  async tagAndRelease(opts = {}) {
-    console.log(this);
+module.exports = {
+  async run(opts = {}) {
     if (!opts.commitMessage) {
       return {
         status: 'error',
