@@ -36,6 +36,7 @@ module.exports =  {
       }
     }
     catch (err) {
+      console.log(chalk.red(err))
       return {
         status: 'error',
         error: err
