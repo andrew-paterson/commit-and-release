@@ -24,6 +24,7 @@ module.exports =  {
       const tagArgs = opts.tagMessage ? ['-a', newTag, '-m', opts.tagMessage] : [newTag];
       await git.tag(tagArgs);
       const showTag = await git.show(newTag);
+      console.log(showTag);
       const newtagCommit = showTag.split('\n').filter(line => line.startsWith('commit'));
       console.log(chalk.green(`Added new ${showTag.split('\n')[0]} to ${newtagCommit}`));
       await git.push();
