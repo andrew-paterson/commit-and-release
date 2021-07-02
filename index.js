@@ -66,7 +66,7 @@ module.exports = {
         status: 'success',
         results: {
           tag: newTag,
-          commit: commit.commit
+          commit: commitResult.commit
         }
       }
     }
