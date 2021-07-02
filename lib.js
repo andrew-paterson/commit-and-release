@@ -1,5 +1,5 @@
 module.exports =  {
-  bumpTag(git, opts) {
+  bumpTag(git, opts = {}) {
     const releaseType = opts.releaseType || 'patch';
     return new Promise((resolve, reject) => {
       const releaseTypes = ['major', 'minor', 'patch'];
