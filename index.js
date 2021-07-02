@@ -1,6 +1,8 @@
 const chalk = require('chalk');
 const simpleGit = require('simple-git');
 const path = require('path');
+const { fstat } = require('fs');
+const fs = require('fs');
 
 module.exports =  {
   async tagAndRelease(opts = {}) {
@@ -10,22 +12,34 @@ module.exports =  {
         error: 'You must pass commitMessage in the options arg.'
       }
     }
+    const baseDir = opts.repo ? path.resolve(opts.repo) : path.resolve(process.cwd());
     const options = {
-      baseDir: opts.repo ? path.resolve(opts.repo) : path.resolve(process.cwd()),
+      baseDir: baseDir,
     }
     const commitMessage = opts.commitMessage;
     const git = simpleGit(options);
+    let packageFile;
     try {
+      packageFile = require(`${baseDir}/package.json`)
+    }
+    catch (err) {
+      packageFile = null;
+    }
+    try {
+      const newTag = await this.bumpTag(git, {releaseType: opts.releaseType});
+      if (packageFile) {
+        packageFile.version = newTag;
+        fs.writeFileSync(`${baseDir}/package.json`, JSON.stringify(packageFile));
+      }
       await git.add('.');
       console.log(chalk.green('Added untracked files'));
       const commit = await git.commit(commitMessage);
       console.log(chalk.green(`Committed changes to ${commit.commit} in branch ${commit.branch}: ${JSON.stringify(commit.summary)}`));
-      const newTag = await this.bumpTag(git, {releaseType: opts.releaseType});
       const tagArgs = opts.tagMessage ? ['-a', newTag, '-m', opts.tagMessage] : [newTag];
       await git.tag(tagArgs);
       const showTag = await git.show(newTag);
-      const newtagCommit = showTag.split('\n').filter(line => line.startsWith('commit'));
-      console.log(chalk.green(`Added tag ${newTag} to ${newtagCommit}`));
+      const newTagCommit = showTag.split('\n').filter(line => line.startsWith('commit'));
+      console.log(chalk.green(`Added tag ${newTag} to ${newTagCommit}`));
       await git.push();
       console.log(chalk.green('Pushed code'));
       await git.push(['--tags']);
