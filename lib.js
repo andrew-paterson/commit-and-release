@@ -20,7 +20,7 @@ module.exports =  {
       console.log(chalk.green('Added untracked files'));
       const commit = await git.commit(commitMessage);
       console.log(chalk.green(`Committed changes to ${commit.commit} in branch ${commit.branch}: ${JSON.stringify(commit.summary)}`));
-      const newTag = await lib.bumpTag(git);
+      const newTag = await this.bumpTag(git);
       const tagArgs = opts.tagMessage ? ['-a', newTag, '-m', opts.tagMessage] : [newTag];
       await git.tag(tagArgs);
       const showTag = await git.show(newTag);
