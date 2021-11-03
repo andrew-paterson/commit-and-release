@@ -26,8 +26,8 @@ module.exports = {
       packageFile = {};
     }
     try {
-      const diff = await git.diff();
-      const hasChangesToCommit = diff.length > 0;
+      const status = await git.status();
+      const hasChangesToCommit = status.files.length > 0;
       const gitLog = await git.log();
       const headTag = gitLog.latest.refs.match(/.*tag: (.*?),.*/);
       let newTag;

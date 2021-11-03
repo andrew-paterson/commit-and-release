@@ -1,6 +1,6 @@
 {
   "name": "tag-and-release",
-  "version": "v1.0.13",
+  "version": "v1.0.14",
   "description": "With a git repository, this module stages all untracked files, bumps the version number in package.json, commits changes, tags the commit with the bumped version number and pushes bo the code and tags.",
   "main": "index.js",
   "respository": "https://github.com/andrew-paterson/tag-and-release",

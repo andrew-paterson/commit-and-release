@@ -1,4 +1,4 @@
-const  tagAndRelease = require('./index');
+const tagAndRelease = require('./index');
 const nodeUtils = require('node-utils');
 const commitMessage = nodeUtils.getNamedArgVal('--commit-msg');
 const releaseType = nodeUtils.getNamedArgVal('--release-type');
