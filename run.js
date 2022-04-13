@@ -1,7 +1,7 @@
 const tagAndRelease = require('./index');
-const nodeUtils = require('node-utils');
-const commitMessage = nodeUtils.getNamedArgVal('--commit-msg');
-const releaseType = nodeUtils.getNamedArgVal('--release-type');
+const lib = require('node-sundries');
+const commitMessage = lib.getNamedArgVal('--commit-msg');
+const releaseType = lib.getNamedArgVal('--release-type');
 
 if (!commitMessage) {
   console.log('The --commit_msg argument is required.');
